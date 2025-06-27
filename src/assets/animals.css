@@ -1,0 +1,99 @@
+.animals-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 24px;
+  font-family: 'Segoe UI', sans-serif;
+  color: #333;
+  background: #f9f9f9;
+}
+
+h2 {
+  font-size: 26px;
+  margin-bottom: 20px;
+  color: #222;
+}
+
+.btn {
+  padding: 8px 14px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 14px;
+  margin: 4px;
+  cursor: pointer;
+  border: none;
+  transition: 0.2s ease-in-out;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-edit {
+  background-color: #ffc107;
+  color: white;
+}
+
+.btn-delete {
+  background-color: #dc3545;
+  color: white;
+}
+
+.animals-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  margin-top: 16px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+}
+
+.animals-table th,
+.animals-table td {
+  padding: 12px;
+  border: 1px solid #e5e5e5;
+  text-align: left;
+}
+
+.animals-table th {
+  background-color: #f1f1f1;
+}
+
+.form-container {
+  background: white;
+  padding: 24px;
+  margin-top: 24px;
+  border-radius: 8px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-input,
+select,
+textarea {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  margin-bottom: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.btn.small {
+  padding: 6px 10px;
+  font-size: 12px;
+}
