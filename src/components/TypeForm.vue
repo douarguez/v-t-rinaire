@@ -1,29 +1,48 @@
 <template>
-  <div class="form-container">
-    <h3>Ajouter un type</h3>
-    <form @submit.prevent="submit">
-      <input v-model="type.nom" placeholder="Nom du type" class="form-input" required />
-      <input v-model="type.categorie" placeholder="Catégorie" class="form-input" />
-      <textarea v-model="type.description" placeholder="Description" class="form-input" />
-      <div class="form-actions">
-        <button class="btn btn-primary" type="submit">Ajouter</button>
-        <button class="btn btn-cancel" type="button" @click="$emit('close')">Annuler</button>
-      </div>
-    </form>
+  <div class="modal-overlay">
+    <div class="modal">
+      <h3>Ajouter un type d’animal</h3>
+      <form @submit.prevent="soumettre">
+        <div class="form-group">
+          <label>Nom :</label>
+          <input v-model="nom" class="form-control" required />
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
+          <button type="button" class="btn btn-secondary" @click="$emit('close')">Annuler</button>
+        </div>
+      </form>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { reactive } from 'vue'
-const emit = defineEmits(['saved', 'close'])
+import { ref } from 'vue'
+defineEmits(['saved', 'close'])
 
-const type = reactive({
-  nom: '',
-  categorie: '',
-  description: ''
-})
+const nom = ref('')
 
-function submit() {
-  emit('saved', { ...type })
+function soumettre() {
+  if (nom.value.trim()) {
+    emit('saved', { nom: nom.value.trim() })
+    nom.value = ''
+  }
 }
 </script>
+
+<style scoped>
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal {
+  background: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  width: 400px;
+}
+</style>

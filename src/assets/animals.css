@@ -1,99 +1,56 @@
 .animals-container {
   max-width: 1000px;
-  margin: 0 auto;
-  padding: 24px;
-  font-family: 'Segoe UI', sans-serif;
-  color: #333;
-  background: #f9f9f9;
+  margin: 2rem auto;
+  padding: 2rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #2f2f2f;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
 }
 
 h2 {
-  font-size: 26px;
-  margin-bottom: 20px;
-  color: #222;
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #1a1a1a;
+  letter-spacing: -0.5px;
 }
 
-.btn {
-  padding: 8px 14px;
-  border-radius: 4px;
-  font-weight: bold;
-  font-size: 14px;
-  margin: 4px;
-  cursor: pointer;
+button.btn {
+  padding: 0.6rem 1.2rem;
+  font-size: 15px;
+  border-radius: 6px;
   border: none;
-  transition: 0.2s ease-in-out;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
-.btn-primary {
+button.btn-primary {
   background-color: #007bff;
-  color: white;
-}
-
-.btn-secondary {
-  background-color: #6c757d;
-  color: white;
-}
-
-.btn-edit {
-  background-color: #ffc107;
-  color: white;
-}
-
-.btn-delete {
-  background-color: #dc3545;
   color: white;
 }
 
 .animals-table {
   width: 100%;
-  border-collapse: collapse;
-  background-color: white;
-  margin-top: 16px;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
-}
-
-.animals-table th,
-.animals-table td {
-  padding: 12px;
-  border: 1px solid #e5e5e5;
-  text-align: left;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+  margin-top: 1rem;
 }
 
 .animals-table th {
-  background-color: #f1f1f1;
-}
-
-.form-container {
-  background: white;
-  padding: 24px;
-  margin-top: 24px;
-  border-radius: 8px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-}
-
-.form-input,
-select,
-textarea {
-  width: 100%;
-  padding: 10px;
+  text-align: left;
+  font-weight: 600;
+  padding: 0.75rem 1rem;
   font-size: 14px;
-  margin-bottom: 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  color: #555;
 }
 
-.form-group {
-  margin-bottom: 16px;
-}
-
-.form-actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-}
-
-.btn.small {
-  padding: 6px 10px;
-  font-size: 12px;
+.animals-table td {
+  background-color: #f9f9f9;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  font-size: 15px;
 }

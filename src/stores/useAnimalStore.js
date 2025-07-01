@@ -1,30 +1,52 @@
+// src/stores/useAnimalStore.js
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
-export const useAnimalStore = defineStore('animalStore', () => {
-  const animals = ref([
-    { id: 1, name: 'Bella', species: 'Chien', typeId: 1, owner: 'Mme Saidi' }
-  ])
-
-  const types = ref([
-    { id: 1, nom: 'Chien' },
-    { id: 2, nom: 'Chat' }
-  ])
+export const useAnimalStore = defineStore('animal', () => {
+  const animals = ref([])
+  const types = ref([])
 
   function addAnimal(animal) {
     animal.id = Date.now()
     animals.value.push(animal)
   }
 
-  function updateAnimal(updated) {
-    const index = animals.value.findIndex(a => a.id === updated.id)
-    if (index !== -1) animals.value[index] = updated
+  function updateAnimal(animal) {
+    const index = animals.value.findIndex(a => a.id === animal.id)
+    if (index !== -1) animals.value[index] = { ...animal }
   }
 
-  function addType(newType) {
-    newType.id = Date.now()
-    types.value.push(newType)
+  function deleteAnimal(id) {
+    animals.value = animals.value.filter(a => a.id !== id)
   }
 
-  return { animals, types, addAnimal, updateAnimal, addType }
+  function addType(type) {
+    const exists = types.value.some(t => t.nom.toLowerCase() === type.nom.toLowerCase())
+    if (!exists) {
+      type.id = Date.now()
+      types.value.push(type)
+    } else {
+      alert('Ce type existe déjà.')
+    }
+  }
+
+  function updateType(type) {
+    const index = types.value.findIndex(t => t.id === type.id)
+    if (index !== -1) types.value[index] = { ...type }
+  }
+
+  function deleteType(id) {
+    types.value = types.value.filter(t => t.id !== id)
+  }
+
+  return {
+    animals,
+    types,
+    addAnimal,
+    updateAnimal,
+    deleteAnimal,
+    addType,
+    updateType,
+    deleteType
+  }
 })

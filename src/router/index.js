@@ -21,11 +21,19 @@ const routes = [
             /* webpackChunkName: "dashboard" */ '@/views/dashboard/Dashboard.vue'
           ),
       },
+     {
+      path: '/utilisateurs',
+      name: 'Utilisateurs',
+      component: () => import('@/views/parametrage/Utilisateurs.vue')
+    },
+
       {
-        path: '/users',
-        name: 'Users',
-        component: () => import('@/views/Users.vue'),
+        path: '/parametrage/types-animaux',
+        name: 'TypesAnimaux',
+        component: () => import('@/views/parametrage/TypesAnimaux.vue'),
       },
+
+
       {
         path: '/animaux',
         name: 'ListeAnimaux',
@@ -42,12 +50,7 @@ const routes = [
         name: 'AjouterAnimal',
         component: () => import('@/views/AjouterAnimal.vue'),
       },
-      {
-        path: '/parametrage/types-animaux',
-        name: 'TypesAnimaux',
-        component: () => import('@/views/TypesAnimaux.vue')
-      },
-
+    
 
      
   
@@ -61,6 +64,18 @@ const routes = [
         name: 'Colors',
         component: () => import('@/views/theme/Colors.vue'),
       },
+      {
+        path: '/clients',
+        name: 'ListeClients',
+        component: () => import('@/views/ListeClients.vue')
+      },
+      {
+        path: '/clients/:id/animaux',
+        name: 'AnimauxClient',
+        component: () => import('@/views/AnimauxClient.vue')
+      },
+
+
       {
         path: '/theme/typography',
         name: 'Typography',

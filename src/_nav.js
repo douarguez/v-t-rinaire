@@ -16,6 +16,12 @@ export default [
     icon: 'cil-paw',
   },
   {
+  component: 'CNavItem',
+  name: 'Clients',
+  to: '/clients',
+  icon: 'cil-user'
+  },
+  {
     component: 'CNavGroup',
     name: 'Paramétrage',
     icon: 'cil-settings',
@@ -23,8 +29,8 @@ export default [
       {
         component: 'CNavItem',
         name: 'Gestion des utilisateurs',
-        to: '/parametrage/utilisateurs',
-        icon: 'cil-user',
+        to: '/utilisateurs',
+        icon: 'cil-user'
       },
       {
         component: 'CNavItem',
@@ -36,4 +42,5 @@ export default [
       // Tu peux rajouter ici d'autres paramètres
     ],
   },
+
 ]
