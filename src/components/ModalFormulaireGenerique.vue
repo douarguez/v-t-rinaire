@@ -47,26 +47,24 @@ const props = defineProps({
   ownerId: Number,
   ownerName: String
 })
-s
+
 const form = ref({})
 
 watchEffect(() => {
   if (props.fields?.length) {
-    const base = {}
-    props.fields.forEach(f => {
-      base[f.key] = props.initialValues?.[f.key] ?? ''
+    // ⚠️ Ne pas remplacer form.value, mais le modifier (réactivité préservée)
+    props.fields.forEach(field => {
+      form.value[field.key] = props.initialValues?.[field.key] ?? ''
     })
-    form.value = base
   }
 })
-
 
 function handleSubmit() {
   emit('saved', {
     ...form.value,
     ownerId: props.ownerId,
     ownerName: props.ownerName,
-    id: Date.now()
+    id: props.initialValues?.id ?? Date.now()
   })
 }
 </script>
@@ -122,7 +120,6 @@ select {
   opacity: 0;
 }
 .form-group:first-of-type {
-  margin-top: 66px; /* ou la valeur que tu souhaites */
+  margin-top: 66px;
 }
-
 </style>

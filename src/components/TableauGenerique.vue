@@ -9,12 +9,14 @@
         </tr>
       </thead>
      <tbody>
-  <tr
-    v-for="(ligne, index) in donnees"
-    :key="index"
-    @click="$emit('ligneClick', ligne)"
-    class="clickable-row"
-  >
+ <tr
+  v-for="(ligne, index) in donnees"
+  :key="index"
+  @click="$emit('ligneClick', ligne); $emit('row-click', ligne)"
+  @contextmenu.prevent="$emit('clicDroit', { event: $event, ligne })"
+  class="clickable-row"
+>
+
     <td v-for="col in colonnes" :key="col.key">
       <template v-if="col.key === 'actions'">
         <button class="btn-edit" @click.stop="$emit('edit', ligne)">📝</button>
@@ -37,7 +39,9 @@ defineProps({
   donnees: { type: Array, required: true }
 })
 
-defineEmits(['ligneClick'])
+defineEmits(['ligneClick', 'row-click', 'clicDroit', 'edit', 'delete'])
+
+
 </script>
 
 <style scoped>

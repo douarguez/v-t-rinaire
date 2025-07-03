@@ -12,12 +12,12 @@
   "license": "MIT",
   "author": "The CoreUI Team (https://github.com/orgs/coreui/people)",
   "scripts": {
-  "dev": "vite --force",
-  "build": "vite build",
-  "lint": "eslint",
-  "preview": "vite preview",
-  "tw:init": "tailwindcss init -p"
-},
+    "dev": "vite --force",
+    "build": "vite build",
+    "lint": "eslint",
+    "preview": "vite preview",
+    "tw:init": "tailwindcss init -p"
+  },
   "dependencies": {
     "@coreui/chartjs": "^4.1.0",
     "@coreui/coreui": "^5.3.1",
@@ -26,6 +26,11 @@
     "@coreui/utils": "^2.0.2",
     "@coreui/vue": "^5.4.1",
     "@coreui/vue-chartjs": "^3.0.0",
+    "@fullcalendar/core": "^6.1.18",
+    "@fullcalendar/daygrid": "^6.1.18",
+    "@fullcalendar/interaction": "^6.1.18",
+    "@fullcalendar/timegrid": "^6.1.18",
+    "@fullcalendar/vue3": "^6.1.18",
     "@popperjs/core": "^2.11.8",
     "chart.js": "^4.4.7",
     "pinia": "^3.0.1",
@@ -45,5 +50,4 @@
     "tailwindcss": "^4.1.10",
     "vite": "^6.1.0"
   }
-
 }

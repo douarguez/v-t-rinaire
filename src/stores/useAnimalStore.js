@@ -7,6 +7,10 @@ export const useAnimalStore = defineStore('animal', () => {
   const types = ref([])
 
   function addAnimal(animal) {
+    if (!animal.clientId) {
+      alert("⚠️ L'animal doit être lié à un client (clientId manquant).")
+      return
+    }
     animal.id = Date.now()
     animals.value.push(animal)
   }
@@ -39,6 +43,14 @@ export const useAnimalStore = defineStore('animal', () => {
     types.value = types.value.filter(t => t.id !== id)
   }
 
+  function getByClientId(clientId) {
+    return animals.value.filter(a => String(a.clientId) === String(clientId))
+  }
+
+  function getById(id) {
+    return animals.value.find(a => a.id === id)
+  }
+
   return {
     animals,
     types,
@@ -47,6 +59,8 @@ export const useAnimalStore = defineStore('animal', () => {
     deleteAnimal,
     addType,
     updateType,
-    deleteType
+    deleteType,
+    getByClientId,
+    getById
   }
 })

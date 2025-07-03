@@ -37,10 +37,18 @@ export default [
         name: 'Types d’animaux',
         to: '/parametrage/types-animaux',
         icon: 'cil-paw',
-      }
+      },
+  
 
       // Tu peux rajouter ici d'autres paramètres
     ],
   },
+  {
+  component: 'CNavItem',
+  name: 'Calendrier',
+  icon: 'cil-calendar',
+  to: '/calendrier'
+}
+
 
 ]

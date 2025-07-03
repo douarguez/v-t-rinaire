@@ -26,6 +26,7 @@ const routes = [
       name: 'Utilisateurs',
       component: () => import('@/views/parametrage/Utilisateurs.vue')
     },
+    
 
       {
         path: '/parametrage/types-animaux',
@@ -74,6 +75,12 @@ const routes = [
         name: 'AnimauxClient',
         component: () => import('@/views/AnimauxClient.vue')
       },
+      {
+        path: '/calendrier',
+        name: 'Calendrier',
+        component: () => import('@/views/Calendrier.vue')
+      },
+
 
 
       {

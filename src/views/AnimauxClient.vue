@@ -67,10 +67,10 @@ const fieldsAnimal = [
 ]
 
 function ajouterAnimal(animal) {
-  const nouveau = {
+    const nouveau = {
     ...animal,
-    ownerId: clientId,
-    ownerName: clientName.value,
+    id: Date.now(), // ✅ ID automatique
+    clientId: clientId, // ✅ Liaison explicite au client (même si ownerId déjà là)
     fiche: '🔍'
   }
   addAnimal(nouveau)
