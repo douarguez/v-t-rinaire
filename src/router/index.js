@@ -2,6 +2,7 @@ import { h, resolveComponent } from 'vue'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import DefaultLayout from '@/layouts/DefaultLayout'
 import Login from '@/views/Login.vue'
+import FicheMedical from '@/views/FicheMedical.vue'
 
 const routes = [
  {
@@ -41,17 +42,17 @@ const routes = [
         component: () => import('@/views/Animaux.vue'), 
       },
       {
-        path: '/animal/:id',
-        name: 'FicheAnimal',
-        component: () => import('@/views/FicheAnimal.vue'),
-        props: true,
-      },
+    path: '/fiche-animal/:animalId',
+    name: 'FicheMedical',
+    component: FicheMedical,
+    props: true
+  },
       {
         path: '/animaux/ajouter',
         name: 'AjouterAnimal',
         component: () => import('@/views/AjouterAnimal.vue'),
       },
-    
+  
 
      
   
@@ -80,7 +81,7 @@ const routes = [
         name: 'Calendrier',
         component: () => import('@/views/Calendrier.vue')
       },
-
+       
 
 
       {

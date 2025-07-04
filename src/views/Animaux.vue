@@ -1,96 +1,165 @@
 <template>
-  <div class="animals-container">
-    <h2>Liste des animaux</h2>
+  <div class="page-animaux">
+    <div class="page-header">
+      <h2>{{ total }} animaux enregistrés</h2>
+      <button class="btn btn-primary" @click="showModal = true">+ Ajouter un animal</button>
+    </div>
 
-    <button class="btn btn-primary" @click="router.push('/animaux/ajouter')">
-      + Ajouter un animal
-    </button>
+    <div class="filters">
+      <input v-model="filtreNom" placeholder="🔎 Filtrer par nom" class="input" />
+      <select v-model="filtreEspece" class="input">
+        <option value="">Toutes les espèces</option>
+        <option v-for="type in typesDisponibles" :key="type">{{ type }}</option>
+      </select>
+    </div>
 
-    <table class="animals-table">
-      <thead>
-        <tr>
-          <th>Nom</th>
-          <th>Espèce</th>
-          <th>Type</th>
-          <th>Propriétaire</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="animal in animals" :key="animal.id">
-          <td>{{ animal.name }}</td>
-          <td>{{ animal.species }}</td>
-          <td>{{ getTypeName(animal.typeId) }}</td>
-          <td>{{ animal.owner }}</td>
-          <td>
-            <button class="btn btn-edit" @click="editAnimal(animal)">Modifier</button>
-            <button class="btn btn-delete" @click="deleteAnimal(animal.id)">Supprimer</button>
-          </td>
-        </tr>
-      </tbody>
+    <table class="table-animaux">
+      <tr>
+        <th>Nom</th><th>Âge</th><th>Sexe</th><th>Espèce</th><th>Race</th><th>Quantité</th><th>Client</th>
+      </tr>
+      <tr
+        v-for="animal in animauxFiltres"
+        :key="animal.id"
+        @contextmenu.prevent="ouvrirMenu($event, animal)"
+      >
+        <td>{{ animal.nom }}</td>
+        <td>{{ animal.age }}</td>
+        <td>{{ animal.sexe }}</td>
+        <td>{{ animal.espece }}</td>
+        <td>{{ animal.breed }}</td>
+        <td>{{ animal.quantite }}</td>
+        <td>{{ animal.clientNom }}</td>
+      </tr>
     </table>
 
-    <AnimalForm
-      v-if="showForm"
-      :initial-animal="editingAnimal"
-      :types="types"
-      @saved="saveAnimal"
-      @close="closeForm"
-      @add-type="showTypeForm = true"
+    <MenuContextuelAnimal
+      :visible="menuVisible"
+      :x="menuX"
+      :y="menuY"
+      :animal="animalSelectionne"
+      @modifier="ouvrirModale"
+      @fiche="router.push(`/fiche-animal/${animalSelectionne.id}`)"
+      @supprimer="animalStore.deleteAnimal(animalSelectionne.id)"
     />
 
-    <TypeForm
-      v-if="showTypeForm"
-      @saved="addType"
-      @close="showTypeForm = false"
+    <ModalFormulaireGenerique
+      v-if="showModal"
+      title="Ajouter un animal"
+      :fields="fieldsAnimal"
+      @saved="ajouterAnimal"
+      @close="showModal = false"
     />
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import AnimalForm from '@/components/AnimalForm.vue'
-import TypeForm from '@/components/TypeForm.vue'
 import { useAnimalStore } from '@/stores/useAnimalStore'
-import '@/assets/animals.css'
+import { useClientStore } from '@/stores/useClientStore'
+import ModalFormulaireGenerique from '@/components/ModalFormulaireGenerique.vue'
+import MenuContextuelAnimal from '@/components/MenuContextuelAnimal.vue'
 
+const { animals, addAnimal, deleteAnimal, types } = useAnimalStore()
+const { clients } = useClientStore()
 const router = useRouter()
-const store = useAnimalStore()
-const { animals, types, addAnimal, updateAnimal, addType } = store
 
-const showForm = ref(false)
-const showTypeForm = ref(false)
-const editingAnimal = ref(null)
+const showModal = ref(false)
+const filtreNom = ref('')
+const filtreEspece = ref('')
+const animalSelectionne = ref(null)
+const menuVisible = ref(false)
+const menuX = ref(0)
+const menuY = ref(0)
 
-function editAnimal(animal) {
-  editingAnimal.value = { ...animal }
-  showForm.value = true
+function ouvrirMenu(event, animal) {
+  menuX.value = event.clientX
+  menuY.value = event.clientY
+  animalSelectionne.value = animal
+  menuVisible.value = true
+}
+onMounted(() => window.addEventListener('click', () => (menuVisible.value = false)))
+
+const typesDisponibles = computed(() => types.map(t => t.nom))
+
+const animalsAvecClient = computed(() =>
+  animals.map(a => ({
+    ...a,
+    clientNom: clients.find(c => c.id === a.clientId)?.prenom + ' ' + clients.find(c => c.id === a.clientId)?.nom || '❓'
+  }))
+)
+
+const animauxFiltres = computed(() =>
+  animalsAvecClient.value.filter(a =>
+    a.nom.toLowerCase().includes(filtreNom.value.toLowerCase()) &&
+    (filtreEspece.value ? a.espece === filtreEspece.value : true)
+  )
+)
+
+const total = computed(() => animals.length)
+
+const fieldsAnimal = [
+  { key: 'nom', label: 'Nom', type: 'text', required: true },
+  { key: 'age', label: 'Âge', type: 'number' },
+  { key: 'sexe', label: 'Sexe', type: 'select', options: ['Mâle', 'Femelle'], required: true },
+  { key: 'espece', label: 'Espèce', type: 'select', options: typesDisponibles.value },
+  { key: 'breed', label: 'Race', type: 'text' },
+  { key: 'quantite', label: 'Quantité', type: 'number' }
+]
+
+function ajouterAnimal(animal) {
+  const clientParDefaut = clients[0] || {}
+  addAnimal({
+    ...animal,
+    id: Date.now(),
+    clientId: clientParDefaut.id,
+    clientNom: clientParDefaut.nom
+  })
+  showModal.value = false
 }
 
-function deleteAnimal(id) {
-  const index = animals.findIndex(a => a.id === id)
-  if (index !== -1 && confirm('Supprimer cet animal ?')) {
-    animals.splice(index, 1)
-  }
-}
-
-function saveAnimal(animal) {
-  if (animal.id) {
-    updateAnimal(animal)
-  } else {
-    addAnimal(animal)
-  }
-  closeForm()
-}
-
-function closeForm() {
-  showForm.value = false
-  editingAnimal.value = null
-}
-
-function getTypeName(id) {
-  const type = types.find(t => t.id === id)
-  return type ? type.nom : '-'
+function ouvrirModale() {
+  showModal.value = true
 }
 </script>
+
+<style scoped>
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.2rem;
+}
+.filters {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.input {
+  padding: 0.5rem;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+.btn-primary {
+  background-color: #7a9cc6;
+  color: white;
+  padding: 0.45rem 1rem;
+  font-size: 13px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+.table-animaux {
+  width: 100%;
+  border-collapse: collapse;
+}
+.table-animaux th,
+.table-animaux td {
+  padding: 0.6rem;
+  border-bottom: 1px solid #eee;
+}
+.table-animaux tr:hover {
+  background-color: #f9fbff;
+}
+</style>

@@ -1,9 +1,10 @@
+// src/stores/useClientStore.js
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { useAnimalStore } from './useAnimalStore'
 
 export const useClientStore = defineStore('client', () => {
   const clients = ref([
-    // Exemple de données initiales (optionnelles)
     {
       id: 1,
       nom: 'Hamdi',
@@ -14,13 +15,13 @@ export const useClientStore = defineStore('client', () => {
     }
   ])
 
-  // ➕ Ajouter un client
+  // ➕ Ajouter
   function addClient(client) {
     client.id = Date.now()
     clients.value.push(client)
   }
 
-  // 📝 Modifier un client existant
+  // 📝 Modifier
   function updateClient(client) {
     const index = clients.value.findIndex(c => c.id === client.id)
     if (index !== -1) {
@@ -28,8 +29,10 @@ export const useClientStore = defineStore('client', () => {
     }
   }
 
-  // ❌ Supprimer un client
+  // ❌ Supprimer + cascade animaux
   function deleteClient(id) {
+    const animalStore = useAnimalStore()
+    animalStore.deleteAnimalsByClient(id) // Supprimer ses animaux
     clients.value = clients.value.filter(c => c.id !== id)
   }
 
