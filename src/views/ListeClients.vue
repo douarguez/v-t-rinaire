@@ -24,8 +24,10 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 
 function allerVersAnimaux(client) {
+  console.log('👤 Client cliqué :', client)
   router.push({ name: 'AnimauxClient', params: { id: client.id } })
 }
+
 
 const showModal = ref(false)
 const { clients, addClient } = useClientStore()
