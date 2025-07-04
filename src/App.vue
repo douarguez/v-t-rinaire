@@ -1,8 +1,9 @@
 <script setup>
 import { onBeforeMount } from 'vue'
 import { useColorModes } from '@coreui/vue'
-
 import { useThemeStore } from '@/stores/theme.js'
+import Toast from '@/components/Toast.vue'
+import { VApp } from 'vuetify/components'
 
 const { isColorModeSet, setColorMode } = useColorModes(
   'coreui-free-vue-admin-template-theme',
@@ -31,12 +32,13 @@ onBeforeMount(() => {
 </script>
 
 <template>
-  <router-view />
+  <v-app>
+    <router-view />
+    <toast/>
+  </v-app>
 </template>
 
 <style lang="scss">
-// Import Main styles for this application
 @use 'styles/style';
-// We use those styles to show code examples, you should remove them in your application.
 @use 'styles/examples';
 </style>

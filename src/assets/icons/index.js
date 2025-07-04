@@ -23,9 +23,18 @@ import {
   cibCcPaypal,
   cibCcApplePay,
   cibCcAmex,
+  cilMedicalCross,
+  cilHistory, // Importé ici une seule fois
 } from '@coreui/icons'
 import { cifUs, cifBr, cifIn, cifFr, cifEs, cifPl } from '@coreui/icons'
 import {
+  
+  cilTrash,
+  cilMoney,
+  cilPaw,
+  cilCat,
+  cilWarning,
+  cilStorage,
   cilArrowBottom,
   cilArrowRight,
   cilArrowTop,
@@ -86,6 +95,14 @@ export const iconsSet = Object.assign(
   {},
   {
     cilArrowBottom,
+    cilWarning,
+    cilTrash,
+    cilCat,
+    cilPaw,
+    cilMoney,
+    cilStorage,
+    cilHistory,
+    cilMedicalCross,
     cilArrowRight,
     cilArrowTop,
     cilBan,

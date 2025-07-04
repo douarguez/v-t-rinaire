@@ -51,6 +51,52 @@ const routes = [
         name: 'AjouterAnimal',
         component: () => import('@/views/AjouterAnimal.vue'),
       },
+     {
+  path: '/medicaments',
+  name: 'Medicaments',
+  component: () => import('@/views/medicaments/ListeMedicaments.vue'),
+  meta: { requiresAuth: true }
+},
+{
+  path: '/medicaments/HistoriqueAchatVente',
+  name: 'HistoriqueMedicaments',
+  component: () => import('@/views/medicaments/HistoriqueAchatVente.vue'),
+},
+{
+  path: '/medicaments/StockAlerte',
+  name: 'AlertesStock',
+  component: () => import('@/views/medicaments/StockAlerte.vue'),
+},
+{
+  path: '/factures/nouvelle',
+  name: 'Facturation',
+  component: () => import('@/views/GestionDesFactures/Facturation.vue'),
+  meta: { requiresAuth: true }
+},
+{
+  path: '/factures',
+  name: 'Factures',
+  component: () => import('@/views/GestionDesFactures/Factures.vue'),
+  meta: { requiresAuth: true }
+},
+{
+  path: '/historique-factures',
+  name: 'HistoriqueFactures',
+  component: () => import('@/views/GestionDesFactures/HistoriqueFactures.vue')
+},
+{
+  path: '/factures/:id',
+  name: 'FacturesClient',
+  component: () => import('@/views/GestionDesFactures/FacturesClient.vue')
+},
+{
+  path: '/factures-clients',
+  name: 'FacturesParClient',
+  component: () => import('@/views/GestionDesFactures/FacturesParClient.vue')
+},
+
+
+
     
 
      
@@ -356,8 +402,11 @@ const routes = [
         name: 'Register',
         component: () => import('@/views/pages/Register'),
       },
+
     ],
   },
+  
+
 ]
 
 const router = createRouter({

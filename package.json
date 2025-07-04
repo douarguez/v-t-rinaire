@@ -22,7 +22,7 @@
     "@coreui/chartjs": "^4.1.0",
     "@coreui/coreui": "^5.3.1",
     "@coreui/icons": "^3.0.1",
-    "@coreui/icons-vue": "2.2.0",
+    "@coreui/icons-vue": "^2.2.0",
     "@coreui/utils": "^2.0.2",
     "@coreui/vue": "^5.4.1",
     "@coreui/vue-chartjs": "^3.0.0",
@@ -31,8 +31,11 @@
     "@fullcalendar/interaction": "^6.1.18",
     "@fullcalendar/timegrid": "^6.1.18",
     "@fullcalendar/vue3": "^6.1.18",
+    "@mdi/font": "^7.4.47",
+
     "@popperjs/core": "^2.11.8",
     "chart.js": "^4.4.7",
+    "jspdf": "^3.0.1",
     "pinia": "^3.0.1",
     "simplebar-vue": "^2.4.0",
     "vue": "^3.5.13",
@@ -46,8 +49,10 @@
     "eslint-plugin-vue": "^9.32.0",
     "globals": "^15.15.0",
     "postcss": "^8.5.6",
-    "sass": "^1.85.0",
+    "sass": "^1.89.2",
+    "sass-loader": "^12.6.0",
     "tailwindcss": "^4.1.10",
-    "vite": "^6.1.0"
+    "vite": "^6.1.0",
+    "vuetify": "^3.8.12"
   }
 }
