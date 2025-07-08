@@ -1,13 +1,9 @@
 export default [
   {
     component: 'CNavItem',
-    name: 'Dashboard',
+    name: 'Tableau de bord',
     to: '/dashboard',
     icon: 'cil-speedometer',
-    badge: {
-      color: 'primary',
-      text: 'NEW',
-    },
   },
   {
     component: 'CNavItem',
@@ -22,75 +18,76 @@ export default [
     icon: 'cil-user',
   },
   {
+    component: 'CNavItem',
+    name: 'Interventions',
+    to: '/interventions',
+    icon: 'cil-notes',
+  },
+  {
+    component: 'CNavItem',
+    name: 'Calendrier',
+    to: '/calendrier',
+    icon: 'cil-calendar',
+  },
+  {
     component: 'CNavGroup',
-    name: 'Paramétrage',
+    name: 'Médicaments',
+    icon: 'cil-medical-cross',
+    items: [
+      {
+        component: 'CNavItem',
+        name: 'Liste des médicaments',
+        to: '/medicaments',
+      },
+      {
+        component: 'CNavItem',
+        name: 'Historique achats/ventes',
+        to: '/medicaments/historique',
+      },
+      {
+        component: 'CNavItem',
+        name: 'Alertes de stock',
+        to: '/medicaments/alerte-stock',
+      },
+    ],
+  },
+  {
+    component: 'CNavGroup',
+    name: 'Facturation',
+    icon: 'cil-money',
+    items: [
+      {
+        component: 'CNavItem',
+        name: 'Historique',
+        to: '/factures',
+      },
+      {
+        component: 'CNavItem',
+        name: 'Nouvelle facture',
+        to: '/factures/nouvelle',
+      },
+    ],
+  },
+  {
+    component: 'CNavGroup',
+    name: 'Paramètres',
     icon: 'cil-settings',
     items: [
       {
         component: 'CNavItem',
-        name: 'Gestion des utilisateurs',
+        name: 'Utilisateurs',
         to: '/utilisateurs',
-        icon: 'cil-user',
       },
       {
         component: 'CNavItem',
         name: 'Types d’animaux',
         to: '/parametrage/types-animaux',
-        icon: 'cil-paw',
-      },
-      // Tu peux rajouter ici d'autres paramètres
-    ],
-  },
-  {
-    component: 'CNavItem',
-    name: 'Calendrier',
-    icon: 'cil-calendar',
-    to: '/calendrier',
-  },
-  {
-    component: 'CNavGroup',
-    name: 'gestion des medicaments',
-    icon: 'cil-storage',
-    items: [
-      {
-        component: 'CNavItem',
-        name: 'Médicaments',
-        to: '/medicaments',
-        icon: 'cil-medical-cross',
       },
       {
         component: 'CNavItem',
-        name: 'Historique',
-        to: '/medicaments/HistoriqueAchatVente',
-        icon: 'cilHistory', // une icône simple et pro
-      },
-      {
-        component: 'CNavItem',
-        name: 'Alerte Stock',
-        to: '/medicaments/StockAlerte',
-        icon: 'cilWarning',
+        name: 'Types d’intervention',
+        to: '/parametrage/types-interventions',
       },
     ],
   },
-  {
-    component: 'CNavGroup',
-    name: 'Gestion des Factures',
-    icon: 'cil-money',
-    items: [
-      {
-        component: 'CNavItem',
-        name: 'Historique des factures',
-        to: '/factures-clients',
-      },
-      {
-        component: 'CNavItem',
-        name: 'Créer Facture',
-        to: '/factures/nouvelle',
-      },
-    ],
-  },
-];
-
-
-
-
+]

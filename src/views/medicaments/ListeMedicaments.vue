@@ -1,19 +1,63 @@
 <template>
-  <div class="page-container">
+  <v-container class="pa-6 background-page">
     <div class="header">
-      <h2>💊 Liste des Médicaments</h2>
-      <button class="btn-add" @click="ouvrirAjout">➕ Ajouter</button>
+      <h2 class="text-h5 font-weight-medium text-title">💊 Liste des Médicaments</h2>
+      <v-btn color="primary" @click="ouvrirAjout" prepend-icon="mdi-plus">Ajouter</v-btn>
     </div>
 
-    <!-- Tableau générique -->
-    <TableauGenerique
-      :colonnes="colonnes"
-      :donnees="medicaments"
-      @edit="ouvrirEdition"
-      @delete="ouvrirSuppression"
-    />
+    <!-- Filtres -->
+    <v-row class="mb-6" dense>
+      <v-col cols="12" md="6">
+        <v-text-field
+          v-model="search"
+          label="Rechercher un médicament"
+          variant="outlined"
+          density="compact"
+        />
+      </v-col>
+      <v-col cols="12" md="6">
+        <v-select
+          v-model="selectedStatus"
+          :items="statusOptions"
+          label="Filtrer par statut de stock"
+          variant="outlined"
+          density="compact"
+          clearable
+        />
+      </v-col>
+    </v-row>
+     <pre>{{ headers }}</pre>
 
-    <!-- Formulaire drawer -->
+    <!-- Tableau -->
+    <v-data-table
+      density="comfortable"
+      :headers="headers"
+      :items="filteredMedicaments"
+      class="elevation-0 table-soft"
+      :items-per-page="10"
+    >
+      <!-- Statut de stock -->
+      <template #item.status="{ item }">
+        <v-chip :color="getStatusColor(item)" variant="tonal" size="small">
+          {{ getStatusText(item) }}
+        </v-chip>
+      </template>
+
+      <!-- Actions -->
+      <template #item.actions="{ item }">
+        <v-btn variant="tonal" size="small" color="primary" class="me-2">
+          COMMANDER
+        </v-btn>
+        <v-btn icon variant="text" color="primary" @click="ouvrirEdition(item)">
+          <v-icon>mdi-pencil</v-icon>
+        </v-btn>
+        <v-btn icon variant="text" color="error" @click="ouvrirSuppression(item)">
+          <v-icon>mdi-delete</v-icon>
+        </v-btn>
+      </template>
+    </v-data-table>
+
+    <!-- Formulaire -->
     <ModalFormulaireMedicaments
       v-if="showDrawer"
       :title="modeEdition ? 'Modifier un médicament' : 'Ajouter un médicament'"
@@ -23,44 +67,21 @@
       @close="fermerDrawer"
     />
 
-    <!-- Popup de suppression -->
+    <!-- Suppression -->
     <SuppressionPopup
       v-if="showPopup"
       :nom="selectedMedicament.nom"
       @confirm="confirmerSuppression"
       @close="showPopup = false"
     />
-  </div>
+  </v-container>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import TableauGenerique from '@/components/TableauGenerique.vue'
+import { ref, computed } from 'vue'
 import ModalFormulaireMedicaments from '@/components/ModalFormulaireMedicaments.vue'
 import SuppressionPopup from '@/components/SuppressionPopup.vue'
 
-// Champs du formulaire
-const formFields = [
-  { key: 'nom', label: 'Nom du médicament', type: 'text', required: true },
-  { key: 'quantite', label: 'Quantité', type: 'number', required: true },
-  { key: 'seuil', label: 'Seuil d\'alerte', type: 'number', required: true },
-  { key: 'prix_achat', label: 'Prix d\'achat', type: 'number', required: true },
-  { key: 'prix_vente', label: 'Prix de vente', type: 'number', required: true },
-  { key: 'expiration', label: 'Date d\'expiration', type: 'text', required: true }
-]
-
-// Colonnes du tableau
-const colonnes = [
-  { key: 'nom', label: 'Nom' },
-  { key: 'quantite', label: 'Quantité' },
-  { key: 'seuil', label: 'Seuil' },
-  { key: 'prix_achat', label: 'Prix Achat' },
-  { key: 'prix_vente', label: 'Prix Vente' },
-  { key: 'expiration', label: 'Expiration' },
-  { key: 'actions', label: 'Actions' }
-]
-
-// Données (factices pour test)
 const medicaments = ref([
   {
     id: 1,
@@ -82,13 +103,58 @@ const medicaments = ref([
   }
 ])
 
-// États
+const headers = [
+  { text: 'Nom', value: 'nom' },
+  { text: 'Quantité', value: 'quantite' },
+  { text: 'Seuil', value: 'seuil' },
+  { text: 'Prix Achat', value: 'prix_achat' },
+  { text: 'Prix Vente', value: 'prix_vente' },
+  { text: 'Expiration', value: 'expiration' },
+  { text: 'Statut de stock', value: 'status', sortable: false },
+  { text: '', value: 'actions', sortable: false },
+]
+
+
+const formFields = [
+  { key: 'nom', label: 'Nom du médicament', type: 'text', required: true },
+  { key: 'quantite', label: 'Quantité', type: 'number', required: true },
+  { key: 'seuil', label: 'Seuil d\'alerte', type: 'number', required: true },
+  { key: 'prix_achat', label: 'Prix d\'achat', type: 'number', required: true },
+  { key: 'prix_vente', label: 'Prix de vente', type: 'number', required: true },
+  { key: 'expiration', label: 'Date d\'expiration', type: 'text', required: true }
+]
+
+const search = ref('')
+const selectedStatus = ref(null)
+const statusOptions = ['Critique', 'À surveiller', 'OK']
+
+function getStatusText(item) {
+  if (item.quantite < item.seuil) return 'Critique'
+  if (item.quantite <= item.seuil + 5) return 'À surveiller'
+  return 'OK'
+}
+
+function getStatusColor(item) {
+  if (item.quantite < item.seuil) return 'error'
+  if (item.quantite <= item.seuil + 5) return 'warning'
+  return 'success'
+}
+
+const filteredMedicaments = computed(() =>
+  medicaments.value.filter(m => {
+    const matchNom = m.nom.toLowerCase().includes(search.value.toLowerCase())
+    const matchStatus = selectedStatus.value
+      ? getStatusText(m) === selectedStatus.value
+      : true
+    return matchNom && matchStatus
+  })
+)
+
 const showDrawer = ref(false)
 const showPopup = ref(false)
 const modeEdition = ref(false)
 const selectedMedicament = ref({})
 
-// Fonctions
 function ouvrirAjout() {
   selectedMedicament.value = {}
   modeEdition.value = false
@@ -127,24 +193,37 @@ function confirmerSuppression() {
 </script>
 
 <style scoped>
-.page-container {
-  padding: 2rem;
+.background-page {
+  background-color: #f5f7fa;
+  min-height: 100vh;
+}
+.table-soft {
+  font-size: 14px;
+  border-radius: 12px;
+}
+.text-title {
+  color: #2c3e50;
 }
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
 }
-.btn-add {
-  background: #0d6efd;
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
+
+/* Affichage clair des en-têtes du tableau */
+.v-data-table thead {
+ display: table-header-group !important;
+  background-color: #ffffff !important;
 }
-.btn-add:hover {
-  background: #084cdf;
+
+
+.v-data-table th {
+  font-size: 14px;
+  font-weight: 500;
+  color: #2c3e50;
+  padding: 12px;
+  border-bottom: 1px solid #dfe6e9;
 }
+
 </style>

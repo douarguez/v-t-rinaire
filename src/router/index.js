@@ -11,7 +11,7 @@ const routes = [
   component: DefaultLayout,
   redirect: '/pages/login', // avant c'était /dashboard
     children: [
-      {
+       {
         path: '/dashboard',
         name: 'Dashboard',
         // route level code-splitting
@@ -20,8 +20,8 @@ const routes = [
         component: () =>
           import(
             /* webpackChunkName: "dashboard" */ '@/views/dashboard/Dashboard.vue'
-          ),
-      },
+          ),
+      },
      {
       path: '/utilisateurs',
       name: 'Utilisateurs',
@@ -67,10 +67,11 @@ const routes = [
   component: () => import('@/views/medicaments/HistoriqueAchatVente.vue'),
 },
 {
-  path: '/medicaments/StockAlerte',
-  name: 'AlertesStock',
+  path: '/medicaments/alerte-stock',
+  name: 'StockAlerte',
   component: () => import('@/views/medicaments/StockAlerte.vue'),
 },
+
 {
   path: '/factures/nouvelle',
   name: 'Facturation',
@@ -84,10 +85,11 @@ const routes = [
   meta: { requiresAuth: true }
 },
 {
-  path: '/historique-factures',
-  name: 'HistoriqueFactures',
-  component: () => import('@/views/GestionDesFactures/HistoriqueFactures.vue')
+  path: '/medicaments/historique',
+  name: 'HistoriqueMedicaments',
+  component: () => import('@/views/medicaments/HistoriqueAchatVente.vue'),
 },
+
 {
   path: '/factures/:id',
   name: 'FacturesClient',
@@ -97,6 +99,17 @@ const routes = [
   path: '/factures-clients',
   name: 'FacturesParClient',
   component: () => import('@/views/GestionDesFactures/FacturesParClient.vue')
+},
+{
+  path: '/interventions',
+  name: 'Interventions',
+  component: () => import('@/views/Interventions.vue'),
+},
+
+{
+  path: '/parametrage/types-interventions',
+  name: 'TypesInterventions',
+  component: () => import('@/views/parametrage/TypesInterventions.vue'),
 },
 
 
