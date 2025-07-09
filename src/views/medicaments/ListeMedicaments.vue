@@ -26,24 +26,21 @@
         />
       </v-col>
     </v-row>
-     <pre>{{ headers }}</pre>
 
     <!-- Tableau -->
     <v-data-table
-      density="comfortable"
       :headers="headers"
-      :items="filteredMedicaments"
-      class="elevation-0 table-soft"
+      :items="medicamentsEnrichis"
       :items-per-page="10"
+      class="elevation-0 table-soft"
+      :no-data-text="'Aucun médicament trouvé'"
     >
-      <!-- Statut de stock -->
       <template #item.status="{ item }">
         <v-chip :color="getStatusColor(item)" variant="tonal" size="small">
-          {{ getStatusText(item) }}
+          {{ item.status }}
         </v-chip>
       </template>
 
-      <!-- Actions -->
       <template #item.actions="{ item }">
         <v-btn variant="tonal" size="small" color="primary" class="me-2">
           COMMANDER
@@ -104,16 +101,15 @@ const medicaments = ref([
 ])
 
 const headers = [
-  { text: 'Nom', value: 'nom' },
-  { text: 'Quantité', value: 'quantite' },
-  { text: 'Seuil', value: 'seuil' },
-  { text: 'Prix Achat', value: 'prix_achat' },
-  { text: 'Prix Vente', value: 'prix_vente' },
-  { text: 'Expiration', value: 'expiration' },
-  { text: 'Statut de stock', value: 'status', sortable: false },
-  { text: '', value: 'actions', sortable: false },
+  { title: 'Nom', value: 'nom' },
+  { title: 'Quantité', value: 'quantite' },
+  { title: 'Seuil', value: 'seuil' },
+  { title: 'Prix Achat', value: 'prix_achat' },
+  { title: 'Prix Vente', value: 'prix_vente' },
+  { title: 'Expiration', value: 'expiration' },
+  { title: 'Statut de stock', value: 'status', sortable: false },
+  { title: '', value: 'actions', sortable: false },
 ]
-
 
 const formFields = [
   { key: 'nom', label: 'Nom du médicament', type: 'text', required: true },
@@ -148,6 +144,13 @@ const filteredMedicaments = computed(() =>
       : true
     return matchNom && matchStatus
   })
+)
+
+const medicamentsEnrichis = computed(() =>
+  filteredMedicaments.value.map(medoc => ({
+    ...medoc,
+    status: getStatusText(medoc)
+  }))
 )
 
 const showDrawer = ref(false)
@@ -210,14 +213,9 @@ function confirmerSuppression() {
   align-items: center;
   margin-bottom: 2rem;
 }
-
-/* Affichage clair des en-têtes du tableau */
-.v-data-table thead {
- display: table-header-group !important;
-  background-color: #ffffff !important;
+.v-data-table tbody tr:hover {
+  background-color: #f0f4f8;
 }
-
-
 .v-data-table th {
   font-size: 14px;
   font-weight: 500;
@@ -225,5 +223,4 @@ function confirmerSuppression() {
   padding: 12px;
   border-bottom: 1px solid #dfe6e9;
 }
-
 </style>

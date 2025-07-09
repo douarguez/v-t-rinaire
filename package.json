@@ -32,12 +32,12 @@
     "@fullcalendar/timegrid": "^6.1.18",
     "@fullcalendar/vue3": "^6.1.18",
     "@mdi/font": "^7.4.47",
-
     "@popperjs/core": "^2.11.8",
     "chart.js": "^4.4.7",
     "jspdf": "^3.0.1",
     "pinia": "^3.0.1",
     "simplebar-vue": "^2.4.0",
+    "vite-plugin-vuetify": "^2.1.1",
     "vue": "^3.5.13",
     "vue-chartjs": "^5.3.2",
     "vue-router": "^4.5.0"
@@ -53,6 +53,6 @@
     "sass-loader": "^12.6.0",
     "tailwindcss": "^4.1.10",
     "vite": "^6.1.0",
-    "vuetify": "^3.8.12"
+    "vuetify": "3"
   }
 }

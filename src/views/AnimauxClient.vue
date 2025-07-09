@@ -2,14 +2,14 @@
   <div class="page-animaux-client">
     <div class="page-header">
       <h2>Animaux de {{ clientName }}</h2>
-      <button class="btn btn-primary" @click="showModal = true">+ Ajouter un animal</button>
+      <v-btn color="primary" @click="showModal = true">+ Ajouter un animal</v-btn>
     </div>
 
     <TableauGenerique :colonnes="colonnes" :donnees="[...animauxClient]" />
 
     <AnimalModalGenerique
       v-if="showModal"
-      :title="'Ajouter un animal'"
+      title="Ajouter un animal"
       :fields="fieldsAnimal"
       :owner-id="clientId"
       :owner-name="clientName"
@@ -28,18 +28,18 @@ import TableauGenerique from '@/components/TableauGenerique.vue'
 import AnimalModalGenerique from '@/components/ModalFormulaireGenerique.vue'
 
 const route = useRoute()
-const clientId = Number(route.params.id)
+const clientId = ref(Number(route.params.id))
 
 const { clients } = useClientStore()
 const { animals, types, addAnimal } = useAnimalStore()
 
-const client = computed(() => clients.find(c => c.id === clientId))
+const client = computed(() => clients.find(c => c.id === clientId.value))
 const clientName = computed(() =>
-  client.value ? `${client.value.prenom} ${client.value.nom}` : 'Client'
+  client.value ? `${client.value.prenom} ${client.value.nom}` : 'Client Inconnu'
 )
 
 const animauxClient = computed(() =>
-  animals.filter(animal => Number(animal.ownerId) === Number(clientId))
+  animals.filter(animal => Number(animal.clientId) === Number(clientId.value)) // ✅ corrigé ici
 )
 
 const colonnes = [
@@ -67,31 +67,35 @@ const fieldsAnimal = [
 ]
 
 function ajouterAnimal(animal) {
-    const nouveau = {
+  const nouveau = {
     ...animal,
-    id: Date.now(), // ✅ ID automatique
-    clientId: clientId, // ✅ Liaison explicite au client (même si ownerId déjà là)
-    fiche: '🔍'
+    id: Date.now(),
+    clientId: clientId.value, // ✅ bien transmis
+    fiche: 'Voir fiche'
   }
   addAnimal(nouveau)
   showModal.value = false
 }
 
-// Optionnel : test d’ajout automatique au chargement
-// onMounted(() => {
-//   addAnimal({
-//     id: Date.now(),
-//     nom: 'Test API',
-//     age: 4,
-//     sexe: 'Mâle',
-//     espece: 'Chien',
-//     breed: 'Berger',
-//     quantite: 1,
-//     ownerId: clientId,
-//     ownerName: clientName.value,
-//     fiche: '🧾'
-//   })
-// })
+onMounted(() => {
+  if (clientId.value) {
+    console.log('clientId au montage :', clientId.value)
+    addAnimal({
+      id: Date.now(),
+      nom: 'Test API',
+      age: 4,
+      sexe: 'Mâle',
+      espece: 'Chien',
+      breed: 'Berger',
+      quantite: 1,
+      clientId: clientId.value, // ✅ corrigé ici aussi
+      ownerName: clientName.value,
+      fiche: 'Voir fiche'
+    })
+  } else {
+    console.warn('clientId non défini au montage, vérifiez la route.')
+  }
+})
 </script>
 
 <style scoped>
@@ -100,14 +104,5 @@ function ajouterAnimal(animal) {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
-}
-.btn-primary {
-  background-color: #007bff;
-  color: white;
-  padding: 0.45rem 1rem;
-  font-size: 13px;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
 }
 </style>

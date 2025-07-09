@@ -17,7 +17,7 @@
           </select>
         </label>
 
-        <!-- Animal du client -->
+        <!-- Animal -->
         <label>
           Animal :
           <select v-model="animalId" :required="animalObligatoire" class="input">
@@ -43,24 +43,19 @@
           </select>
         </label>
 
-        <!-- Date et durée -->
-        <label>
-          Date :
+        <!-- Date / Durée -->
+        <label>Date :
           <input type="datetime-local" v-model="dateISO" class="input" required />
         </label>
-
-        <label>
-          Durée (min) :
+        <label>Durée (min) :
           <input type="number" v-model.number="duree" class="input" min="5" step="5" />
         </label>
 
         <!-- Options -->
-        <label>
-          <input type="checkbox" v-model="ajouterTraitement" />
+        <label><input type="checkbox" v-model="ajouterTraitement" />
           Ajouter traitement associé
         </label>
-        <label>
-          <input type="checkbox" v-model="envoyerNotification" />
+        <label><input type="checkbox" v-model="envoyerNotification" />
           Envoyer une notification
         </label>
 
@@ -68,7 +63,7 @@
           ⚠️ Cet animal est sous traitement actif.
         </div>
 
-        <!-- Actions -->
+        <!-- Boutons -->
         <div class="actions">
           <button type="button" class="btn btn-cancel" @click="$emit('close')">Annuler</button>
           <button type="submit" class="btn btn-confirm">Valider</button>
@@ -91,11 +86,6 @@ const props = defineProps({
 })
 const emit = defineEmits(['close'])
 
-const animalStore = useAnimalStore()
-const clientStore = useClientStore()
-const typeStore = useTypeInterventionStore()
-const interventionStore = useInterventionStore()
-
 const clientId = ref('')
 const animalId = ref('')
 const typeNom = ref('')
@@ -106,9 +96,12 @@ const envoyerNotification = ref(false)
 const alerteTraitement = ref(false)
 const animalObligatoire = ref(true)
 
-const animauxDuClient = computed(() =>
-  animalStore.getByClientId(clientId.value)
-)
+const animalStore = useAnimalStore()
+const clientStore = useClientStore()
+const typeStore = useTypeInterventionStore()
+const interventionStore = useInterventionStore()
+
+const animauxDuClient = computed(() => animalStore.getByClientId(clientId.value))
 
 onMounted(() => {
   if (props.intervention) {
@@ -162,7 +155,7 @@ function valider() {
     allDay: false,
     animalId: animal?.id || null,
     type: type.nom,
-    couleur: type.couleur,
+    color: type.couleur,              // ✅ FullCalendar lit ceci
     icone: type.icone,
     traitement: ajouterTraitement.value,
     rappel: envoyerNotification.value

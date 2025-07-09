@@ -4,6 +4,24 @@ export const useInterventionStore = defineStore('interventionStore', {
   state: () => ({
     interventions: []
   }),
+  getters: {
+    evenements: (state) => {
+      return state.interventions.map(i => ({
+        id: i.id,
+        title: i.title,
+        start: i.start,
+        end: i.end,
+        color: i.color || '#cccccc', // 🎨 couleur compatible FullCalendar
+        extendedProps: {
+          animalId: i.animalId,
+          type: i.type,
+          icone: i.icone,
+          traitement: i.traitement,
+          rappel: i.rappel
+        }
+      }))
+    }
+  },
   actions: {
     ajouter(intervention) {
       this.interventions.push(intervention)

@@ -2,35 +2,58 @@
   <div class="page-animaux">
     <div class="page-header">
       <h2>{{ total }} animaux enregistrés</h2>
-      <button class="btn btn-primary" @click="showModal = true">+ Ajouter un animal</button>
+      <v-btn color="primary" @click="showModal = true">+ Ajouter un animal</v-btn>
     </div>
 
     <div class="filters">
-      <input v-model="filtreNom" placeholder="🔎 Filtrer par nom" class="input" />
-      <select v-model="filtreEspece" class="input">
-        <option value="">Toutes les espèces</option>
-        <option v-for="type in typesDisponibles" :key="type">{{ type }}</option>
-      </select>
+      <v-text-field
+        v-model="filtreNom"
+        label="Filtrer par nom"
+        variant="outlined"
+        density="compact"
+        prepend-inner-icon="mdi-magnify"
+        class="ma-2"
+        hide-details
+      />
+      <v-select
+        v-model="filtreEspece"
+        :items="typesDisponibles"
+        label="Toutes les espèces"
+        variant="outlined"
+        density="compact"
+        class="ma-2"
+        hide-details
+      />
     </div>
 
-    <table class="table-animaux">
-      <tr>
-        <th>Nom</th><th>Âge</th><th>Sexe</th><th>Espèce</th><th>Race</th><th>Quantité</th><th>Client</th>
-      </tr>
-      <tr
-        v-for="animal in animauxFiltres"
-        :key="animal.id"
-        @contextmenu.prevent="ouvrirMenu($event, animal)"
-      >
-        <td>{{ animal.nom }}</td>
-        <td>{{ animal.age }}</td>
-        <td>{{ animal.sexe }}</td>
-        <td>{{ animal.espece }}</td>
-        <td>{{ animal.breed }}</td>
-        <td>{{ animal.quantite }}</td>
-        <td>{{ animal.clientNom }}</td>
-      </tr>
-    </table>
+    <v-table>
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>Âge</th>
+          <th>Sexe</th>
+          <th>Espèce</th>
+          <th>Race</th>
+          <th>Quantité</th>
+          <th>Client</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          v-for="animal in animauxFiltres"
+          :key="animal.id"
+          @contextmenu.prevent="ouvrirMenu($event, animal)"
+        >
+          <td>{{ animal.nom }}</td>
+          <td>{{ animal.age }}</td>
+          <td>{{ animal.sexe }}</td>
+          <td>{{ animal.espece }}</td>
+          <td>{{ animal.breed }}</td>
+          <td>{{ animal.quantite }}</td>
+          <td>{{ animal.clientNom }}</td>
+        </tr>
+      </tbody>
+    </v-table>
 
     <MenuContextuelAnimal
       :visible="menuVisible"
@@ -85,7 +108,7 @@ const typesDisponibles = computed(() => types.map(t => t.nom))
 const animalsAvecClient = computed(() =>
   animals.map(a => ({
     ...a,
-    clientNom: clients.find(c => c.id === a.clientId)?.prenom + ' ' + clients.find(c => c.id === a.clientId)?.nom || '❓'
+    clientNom: clients.find(c => c.id === a.clientId)?.prenom + ' ' + clients.find(c => c.id === a.clientId)?.nom || 'Inconnu'
   }))
 )
 
@@ -134,21 +157,6 @@ function ouvrirModale() {
   display: flex;
   gap: 1rem;
   margin-bottom: 1rem;
-}
-.input {
-  padding: 0.5rem;
-  font-size: 14px;
-  border-radius: 6px;
-  border: 1px solid #ddd;
-}
-.btn-primary {
-  background-color: #7a9cc6;
-  color: white;
-  padding: 0.45rem 1rem;
-  font-size: 13px;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
 }
 .table-animaux {
   width: 100%;

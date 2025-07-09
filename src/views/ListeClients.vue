@@ -2,10 +2,14 @@
   <div class="page-clients">
     <div class="page-header">
       <h2>Liste des clients</h2>
-      <button class="btn btn-primary" @click="showModal = true">+ Ajouter un client</button>
+      <v-btn color="primary" @click="showModal = true">+ Ajouter un client</v-btn>
     </div>
 
-    <TableauGenerique :colonnes="colonnes" :donnees="clients" @ligneClick="allerVersAnimaux" />
+    <TableauGenerique
+      :colonnes="colonnes"
+      :donnees="clients"
+      @ligneClick="allerVersAnimaux"
+    />
 
     <ClientModal
       v-if="showModal"
@@ -24,10 +28,15 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 
 function allerVersAnimaux(client) {
-  console.log('👤 Client cliqué :', client)
-  router.push({ name: 'AnimauxClient', params: { id: client.id } })
+  console.log('Client cliqué :', client)
+  // Utilise id ou numero comme identifiant, selon ce qui est disponible
+  const clientId = client.id || client.numero
+  if (clientId) {
+    router.push({ name: 'AnimauxClient', params: { id: clientId } })
+  } else {
+    console.error('Aucun ID ou numéro trouvé pour le client:', client)
+  }
 }
-
 
 const showModal = ref(false)
 const { clients, addClient } = useClientStore()
@@ -67,15 +76,4 @@ h2 {
   letter-spacing: -0.3px;
   margin: 0;
 }
-
-.btn-primary {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 0.6rem 1rem;
-  border-radius: 6px;
-  font-size: 14px;
-  cursor: pointer;
-}
 </style>
-
