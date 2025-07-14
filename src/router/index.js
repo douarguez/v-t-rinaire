@@ -111,6 +111,11 @@ const routes = [
   name: 'TypesInterventions',
   component: () => import('@/views/parametrage/TypesInterventions.vue'),
 },
+{
+  path: '/animaux-par-type/:typeId',
+  name: 'AnimauxParType',
+  component: () => import('@/views/AnimauxParType.vue')
+},
 
 
 

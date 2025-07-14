@@ -12,7 +12,7 @@
         <tr
           v-for="(ligne, index) in donnees"
           :key="index"
-          @click="$emit('ligneClick', ligne); $emit('row-click', ligne)"
+          @click.stop="$emit('ligneClick', ligne); $emit('row-click', ligne)"
           @contextmenu.prevent="$emit('clicDroit', { event: $event, ligne })"
           class="clickable-row"
         >
@@ -44,8 +44,8 @@
 <script setup>
 import { CIcon } from '@coreui/icons-vue'
 
-defineProps({
-  colonnes: { type: Array, required: true }, // Ex: [{ key: 'nom', label: 'Nom' }, ...]
+const props = defineProps({
+  colonnes: { type: Array, required: true },
   donnees: { type: Array, required: true }
 })
 

@@ -2,7 +2,7 @@
   <div class="page-animaux">
     <div class="page-header">
       <h2>{{ total }} animaux enregistrés</h2>
-      <v-btn color="primary" @click="showModal = true">+ Ajouter un animal</v-btn>
+      <v-btn color="primary" @click="ouvrirModale">+ Ajouter un animal</v-btn>
     </div>
 
     <div class="filters">
@@ -26,34 +26,11 @@
       />
     </div>
 
-    <v-table>
-      <thead>
-        <tr>
-          <th>Nom</th>
-          <th>Âge</th>
-          <th>Sexe</th>
-          <th>Espèce</th>
-          <th>Race</th>
-          <th>Quantité</th>
-          <th>Client</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          v-for="animal in animauxFiltres"
-          :key="animal.id"
-          @contextmenu.prevent="ouvrirMenu($event, animal)"
-        >
-          <td>{{ animal.nom }}</td>
-          <td>{{ animal.age }}</td>
-          <td>{{ animal.sexe }}</td>
-          <td>{{ animal.espece }}</td>
-          <td>{{ animal.breed }}</td>
-          <td>{{ animal.quantite }}</td>
-          <td>{{ animal.clientNom }}</td>
-        </tr>
-      </tbody>
-    </v-table>
+    <TableauGenerique
+      :colonnes="colonnes"
+      :donnees="animauxFiltres"
+      @clicDroit="ouvrirMenu"
+    />
 
     <MenuContextuelAnimal
       :visible="menuVisible"
@@ -61,16 +38,17 @@
       :y="menuY"
       :animal="animalSelectionne"
       @modifier="ouvrirModale"
-      @fiche="router.push(`/fiche-animal/${animalSelectionne.id}`)"
-      @supprimer="animalStore.deleteAnimal(animalSelectionne.id)"
+      @fiche="ouvrirFicheMedicale"
+      @supprimer="supprimerAnimal"
     />
 
     <ModalFormulaireGenerique
       v-if="showModal"
-      title="Ajouter un animal"
+      :title="animalSelectionne ? 'Modifier l’animal' : 'Ajouter un animal'"
       :fields="fieldsAnimal"
-      @saved="ajouterAnimal"
-      @close="showModal = false"
+      :initial-values="animalSelectionne || {}"
+      @saved="enregistrerAnimal"
+      @close="fermerModale"
     />
   </div>
 </template>
@@ -82,8 +60,9 @@ import { useAnimalStore } from '@/stores/useAnimalStore'
 import { useClientStore } from '@/stores/useClientStore'
 import ModalFormulaireGenerique from '@/components/ModalFormulaireGenerique.vue'
 import MenuContextuelAnimal from '@/components/MenuContextuelAnimal.vue'
+import TableauGenerique from '@/components/TableauGenerique.vue'
 
-const { animals, addAnimal, deleteAnimal, types } = useAnimalStore()
+const { animals, addAnimal, updateAnimal, deleteAnimal, types } = useAnimalStore()
 const { clients } = useClientStore()
 const router = useRouter()
 
@@ -95,31 +74,48 @@ const menuVisible = ref(false)
 const menuX = ref(0)
 const menuY = ref(0)
 
-function ouvrirMenu(event, animal) {
+function ouvrirMenu({ event, ligne }) {
+  event.preventDefault()
   menuX.value = event.clientX
   menuY.value = event.clientY
-  animalSelectionne.value = animal
+  animalSelectionne.value = ligne
   menuVisible.value = true
 }
-onMounted(() => window.addEventListener('click', () => (menuVisible.value = false)))
+
+onMounted(() => {
+  window.addEventListener('click', () => menuVisible.value = false)
+})
 
 const typesDisponibles = computed(() => types.map(t => t.nom))
 
 const animalsAvecClient = computed(() =>
-  animals.map(a => ({
-    ...a,
-    clientNom: clients.find(c => c.id === a.clientId)?.prenom + ' ' + clients.find(c => c.id === a.clientId)?.nom || 'Inconnu'
-  }))
+  animals.map(a => {
+    const client = clients.find(c => c.id === a.clientId)
+    return {
+      ...a,
+      clientNom: client ? `${client.prenom} ${client.nom}` : 'Inconnu'
+    }
+  })
 )
 
 const animauxFiltres = computed(() =>
   animalsAvecClient.value.filter(a =>
-    a.nom.toLowerCase().includes(filtreNom.value.toLowerCase()) &&
+    a.nom?.toLowerCase().includes(filtreNom.value.toLowerCase()) &&
     (filtreEspece.value ? a.espece === filtreEspece.value : true)
   )
 )
 
 const total = computed(() => animals.length)
+
+const colonnes = [
+  { key: 'nom', label: 'Nom' },
+  { key: 'age', label: 'Âge' },
+  { key: 'sexe', label: 'Sexe' },
+  { key: 'espece', label: 'Espèce' },
+  { key: 'breed', label: 'Race' },
+  { key: 'quantite', label: 'Quantité' },
+  { key: 'clientNom', label: 'Client' }
+]
 
 const fieldsAnimal = [
   { key: 'nom', label: 'Nom', type: 'text', required: true },
@@ -130,44 +126,65 @@ const fieldsAnimal = [
   { key: 'quantite', label: 'Quantité', type: 'number' }
 ]
 
-function ajouterAnimal(animal) {
-  const clientParDefaut = clients[0] || {}
-  addAnimal({
-    ...animal,
-    id: Date.now(),
-    clientId: clientParDefaut.id,
-    clientNom: clientParDefaut.nom
-  })
-  showModal.value = false
-}
-
 function ouvrirModale() {
   showModal.value = true
+}
+
+function fermerModale() {
+  showModal.value = false
+  animalSelectionne.value = null
+}
+
+function enregistrerAnimal(animal) {
+  const clientParDefaut = clients[0] || {}
+
+  const data = {
+    ...animal,
+    clientId: clientParDefaut.id,
+    clientNom: clientParDefaut.nom
+  }
+
+  if (animalSelectionne.value) {
+    updateAnimal({ ...animalSelectionne.value, ...data })
+  } else {
+    addAnimal({ ...data, id: Date.now() })
+  }
+
+  fermerModale()
+}
+
+function supprimerAnimal(id) {
+  if (!confirm('Confirmer la suppression de cet animal ?')) return
+  deleteAnimal(id)
+}
+
+function ouvrirFicheMedicale(animal) {
+  router.push(`/fiche-animal/${animal.id}`)
 }
 </script>
 
 <style scoped>
+.page-animaux {
+  padding: 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  font-family: 'Inter', sans-serif;
+}
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.2rem;
+  margin-bottom: 1.5rem;
 }
 .filters {
   display: flex;
   gap: 1rem;
   margin-bottom: 1rem;
 }
-.table-animaux {
-  width: 100%;
-  border-collapse: collapse;
-}
-.table-animaux th,
-.table-animaux td {
-  padding: 0.6rem;
-  border-bottom: 1px solid #eee;
-}
-.table-animaux tr:hover {
-  background-color: #f9fbff;
+h2 {
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.3px;
+  margin: 0;
 }
 </style>

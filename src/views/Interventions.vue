@@ -2,74 +2,105 @@
   <div class="page-interventions">
     <div class="page-header">
       <h2> Interventions enregistrées</h2>
-      <v-btn color="primary" @click="showModal = true">+ Ajouter une intervention</v-btn>
+      <v-btn color="primary" @click="ouvrirAjout">+ Ajouter une intervention</v-btn>
     </div>
 
     <TableauGenerique
       :colonnes="colonnes"
-      :donnees="interventions"
-      @ligneClick="handleClickIntervention"
+      :donnees="tableData"
+      @edit="ouvrirEdition"
+      @delete="supprimerIntervention"
     />
 
     <ModalNouvelleIntervention
-  v-if="showModal"
-  title="Ajouter une intervention"
-  :fields="fieldsIntervention"
-  :owner-id="clientId"
-  :owner-name="clientName"
-  :initial-values="{ start: selectedDate }"
-  @saved="ajouterIntervention"
-  @close="showModal = false"
-/>
-
+      v-if="showModal"
+      :intervention="interventionSelectionnee"
+      :dateInitiale="selectedDate"
+      @saved="sauvegarderIntervention"
+      @close="fermerModal"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
 import { useInterventionStore } from '@/stores/useInterventionStore'
+import { useAnimalStore } from '@/stores/useAnimalStore'
+import { useClientStore } from '@/stores/useClientStore'
+import { useTypeInterventionStore } from '@/stores/useTypeInterventionStore'
 import TableauGenerique from '@/components/TableauGenerique.vue'
 import ModalNouvelleIntervention from '@/components/ModalNouvelleIntervention.vue'
 
-const showModal = ref(false)
 const store = useInterventionStore()
-const interventions = computed(() => store.interventions)
-const selectedDate = ref(new Date().toISOString().slice(0,16)) // ou selon ton besoin
+const animalStore = useAnimalStore()
+const clientStore = useClientStore()
+const typeStore = useTypeInterventionStore()
+
+const showModal = ref(false)
+const interventionSelectionnee = ref(null)
+const selectedDate = ref(new Date().toISOString().slice(0, 16))
 
 const colonnes = [
-  { key: 'animalId', label: 'Animal' },
-  { key: 'type', label: 'Type' },
-  { key: 'start', label: 'Date' },
+  { key: 'clientNom', label: 'Client' },
+  { key: 'animalNom', label: 'Animal' },
+  { key: 'typeNom', label: 'Intervention' },
+  { key: 'start', label: 'Date & heure' },
   { key: 'duree', label: 'Durée (min)' },
-  { key: 'traitement', label: 'Traitement' },
-  { key: 'color', label: 'Couleur' }
+  { key: 'actions', label: 'Actions' }
 ]
 
-function ajouterIntervention(i) {
-  const nouveau = {
-    ...i,
-    id: Date.now(),
-    duree: Math.round((new Date(i.end) - new Date(i.start)) / 60000),
-    traitement: !!i.traitement,
-    color: i.color || '#ccc'
-  }
-  store.addIntervention(nouveau)
+const tableData = computed(() =>
+  store.evenements.map(i => {
+    const a = animalStore.getById(i.animalId)
+    const c = a ? clientStore.getById(a.clientId) : null
+    const t = typeStore.types.find(t => t.id === i.typeId)
+
+    const startDate = i.start ? new Date(i.start) : null
+    const endDate = i.end ? new Date(i.end) : null
+    const duration = startDate && endDate
+      ? Math.round((endDate - startDate) / 60000)
+      : '—'
+
+    return {
+      ...i,
+      clientNom: c ? `${c.nom} ${c.prenom}` : '—',
+      animalNom: a ? a.nom : '—',
+      typeNom: t ? t.nom : i.type || '—',
+      start: startDate ? startDate.toLocaleString() : '—',
+      duree: duration
+    }
+  })
+)
+
+function ouvrirAjout() {
+  interventionSelectionnee.value = null
+  selectedDate.value = new Date().toISOString().slice(0, 16)
+  showModal.value = true
+}
+
+function ouvrirEdition(i) {
+  interventionSelectionnee.value = { ...i }
+  selectedDate.value = ''
+  showModal.value = true
+}
+
+function fermerModal() {
+  interventionSelectionnee.value = null
   showModal.value = false
 }
 
-function handleClickIntervention(i) {
-  console.log('Intervention cliquée :', i)
-  // Tu peux naviguer vers la fiche ou afficher une modale de détail
+function sauvegarderIntervention(data) {
+  if (data?.id && store.evenements.find(i => i.id === data.id)) {
+    store.modifier(data.id, data)
+  } else {
+    store.ajouter({ ...data, id: Date.now() })
+  }
+  fermerModal()
 }
 
-const fieldsIntervention = [
-  { key: 'animalId', label: 'Animal', type: 'number', required: true },
-  { key: 'type', label: 'Type', type: 'text', required: true },
-  { key: 'start', label: 'Date début', type: 'datetime-local', required: true },
-  { key: 'end', label: 'Date fin', type: 'datetime-local', required: true },
-  { key: 'traitement', label: 'Traitement effectué', type: 'checkbox' },
-  { key: 'color', label: 'Couleur', type: 'color' }
-]
+function supprimerIntervention(id) {
+  store.supprimer(id)
+}
 </script>
 
 <style scoped>
@@ -79,14 +110,12 @@ const fieldsIntervention = [
   margin: 0 auto;
   font-family: 'Inter', sans-serif;
 }
-
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
 }
-
 h2 {
   font-size: 20px;
   font-weight: 500;

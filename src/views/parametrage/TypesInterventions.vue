@@ -1,14 +1,18 @@
 <template>
   <v-container class="pa-6 background-page">
-    <h2 class="text-h5 font-weight-medium mb-4">⚙️ Types d'interventions</h2>
+    <div class="page-header">
+      <h2 class="text-h5 font-weight-medium">{{ total }} types d’interventions</h2>
+      <v-btn color="primary" @click="ouvrirAjout" prepend-icon="mdi-plus">
+        Ajouter un type
+      </v-btn>
+    </div>
 
-    <!-- Bouton ajout -->
-    <v-btn color="primary" @click="ouvrirAjout" prepend-icon="mdi-plus" class="mb-4">
-      Nouveau type
-    </v-btn>
+    <div v-if="types.length === 0" class="no-data">
+      Aucun type défini. Ajoutez-en un !
+    </div>
 
-    <!-- Tableau -->
     <v-data-table
+      v-else
       :headers="headers"
       :items="types"
       :items-per-page="10"
@@ -60,14 +64,13 @@
       </template>
     </v-data-table>
 
-    <!-- Formulaire drawer -->
     <v-dialog v-model="showDrawer" width="450">
       <v-card>
         <v-card-title>{{ modeEdition ? 'Modifier' : 'Ajouter' }} un type</v-card-title>
         <v-card-text>
           <v-form @submit.prevent="sauvegarder">
             <v-text-field v-model="form.nom" label="Nom du type" required />
-            <v-text-field v-model="form.icone" label="Icône (emoji)" />
+            <v-text-field v-model="form.icone" label="Icône (texte)" />
             <v-text-field v-model="form.duree" label="Durée estimée (min)" type="number" />
             <v-color-picker v-model="form.couleur" hide-canvas flat />
             <v-select
@@ -89,21 +92,23 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useTypeInterventionStore } from '@/stores/useTypeInterventionStore'
 
 const store = useTypeInterventionStore()
 const types = store.types
 
+const total = computed(() => types.length)
+
 const headers = [
-  { text: 'Nom', value: 'nom' },
-  { text: 'Icône', value: 'icone' },
-  { text: 'Durée', value: 'duree' },
-  { text: 'Groupe', value: 'groupe' },
-  { text: 'Couleur', value: 'couleur', sortable: false },
-  { text: 'Traitement ?', value: 'traitement', sortable: false },
-  { text: 'Anesthésie ?', value: 'requiert_anesthesie', sortable: false },
-  { text: '', value: 'actions', sortable: false }
+  { title: 'Nom', value: 'nom' },
+  { title: 'Icône', value: 'icone' },
+  { title: 'Durée', value: 'duree' },
+  { title: 'Groupe', value: 'groupe' },
+  { title: 'Couleur', value: 'couleur', sortable: false },
+  { title: 'Traitement ?', value: 'traitement', sortable: false },
+  { title: 'Anesthésie ?', value: 'requiert_anesthesie', sortable: false },
+  { title: 'Actions', value: 'actions', sortable: false }
 ]
 
 const showDrawer = ref(false)
@@ -166,6 +171,23 @@ function formatDuree(minutes) {
 .background-page {
   background-color: #f5f7fa;
   min-height: 100vh;
+}
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+h2 {
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.3px;
+  margin: 0;
+}
+.no-data {
+  color: #666;
+  text-align: center;
+  padding: 1rem;
 }
 .table-soft {
   font-size: 14px;

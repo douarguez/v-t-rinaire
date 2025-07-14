@@ -1,92 +1,126 @@
 <template>
   <div v-if="animal" class="fiche-page">
-    <h2>Fiche médicale de {{ animal.nom }}</h2>
+    <h2 class="text-h5 font-weight-medium mb-6">🐾 Fiche médicale de {{ animal.nom }}</h2>
 
-    <!-- Identité -->
-    <section class="bloc">
-      <h3>Identité</h3>
+    <!-- Bloc Identité -->
+    <v-card class="bloc">
+      <div class="bloc-header">
+        <h3 class="bloc-titre">🐾 Animal</h3>
+        <v-btn icon size="small" @click="editSection('identite')"><v-icon>mdi-pencil</v-icon></v-btn>
+      </div>
       <ul>
         <li><strong>Nom :</strong> {{ animal.nom }}</li>
         <li><strong>Espèce :</strong> {{ animal.espece }}</li>
-        <li><strong>Race :</strong> {{ animal.breed }}</li>
-        <li><strong>Âge :</strong> {{ animal.age }} ans</li>
+        <li><strong>Race :</strong> {{ animal.race || animal.breed }}</li>
         <li><strong>Sexe :</strong> {{ animal.sexe }}</li>
-        <li><strong>Propriétaire :</strong> {{ client?.prenom }} {{ client?.nom }}</li>
+        <li><strong>Date de naissance :</strong> {{ formatDate(animal.naissance) }}</li>
+        <li><strong>Poids :</strong> {{ animal.poids }} kg</li>
+        <li><strong>Identifiant :</strong> Puce n° {{ animal.identifiant || '—' }}</li>
       </ul>
-    </section>
+    </v-card>
 
-    <!-- Interventions -->
-    <section class="bloc">
-      <h3>🩺 Interventions</h3>
+    <!-- Propriétaire -->
+    <v-card class="bloc">
+      <div class="bloc-header">
+        <h3 class="bloc-titre">👤 Propriétaire</h3>
+        <v-btn icon size="small" @click="editSection('proprietaire')"><v-icon>mdi-pencil</v-icon></v-btn>
+      </div>
+      <ul v-if="client">
+        <li><strong>Nom :</strong> {{ client.nom }} {{ client.prenom }}</li>
+        <li><strong>Téléphone :</strong> {{ client.telephone }}</li>
+        <li><strong>Email :</strong> {{ client.email }}</li>
+      </ul>
+      <p v-else class="text-grey">Aucun propriétaire enregistré.</p>
+    </v-card>
+
+    <!-- Antécédents -->
+    <v-card class="bloc">
+      <div class="bloc-header">
+        <h3 class="bloc-titre">🩺 Antécédents</h3>
+        <v-btn icon size="small" @click="editSection('antecedents')"><v-icon>mdi-pencil</v-icon></v-btn>
+      </div>
+      <ul v-if="fiche.antecedents?.length">
+        <li v-for="a in fiche.antecedents" :key="a">{{ a }}</li>
+      </ul>
+      <p v-else class="text-grey">Aucun antécédent enregistré.</p>
+    </v-card>
+
+    <!-- Vaccins -->
+    <v-card class="bloc">
+      <div class="bloc-header">
+        <h3 class="bloc-titre">💉 Vaccins</h3>
+        <v-btn icon size="small" @click="editSection('vaccins')"><v-icon>mdi-pencil</v-icon></v-btn>
+      </div>
+      <ul v-if="fiche.vaccins?.length">
+        <li v-for="v in fiche.vaccins" :key="v.type">
+          {{ v.type }} : {{ formatDate(v.date) }} — Rappel : {{ formatDate(v.rappel) }}
+        </li>
+      </ul>
+      <p v-else class="text-grey">Aucun vaccin enregistré.</p>
+    </v-card>
+
+    <!-- Traitements -->
+    <v-card class="bloc">
+      <div class="bloc-header">
+        <h3 class="bloc-titre">💊 Traitements en cours</h3>
+        <v-btn icon size="small" @click="editSection('traitements')"><v-icon>mdi-pencil</v-icon></v-btn>
+      </div>
+      <ul v-if="fiche.traitements?.length">
+        <li v-for="t in fiche.traitements" :key="t.id">
+          {{ t.nom }} — Dernière prise : {{ formatDate(t.dateDernierePrise) }}
+        </li>
+      </ul>
+      <p v-else class="text-grey">Aucun traitement actif.</p>
+    </v-card>
+
+    <!-- Dernière consultation -->
+    <v-card class="bloc" v-if="fiche.derniereConsultation">
+      <div class="bloc-header">
+        <h3 class="bloc-titre">📅 Dernière consultation</h3>
+      </div>
+      <p>{{ formatDate(fiche.derniereConsultation.date) }} : {{ fiche.derniereConsultation.objet }}</p>
+    </v-card>
+
+    <!-- Historique -->
+    <v-card class="bloc">
+      <div class="bloc-header">
+        <h3 class="bloc-titre">📖 Historique des interventions</h3>
+        <v-btn icon size="small" @click="editSection('interventions')"><v-icon>mdi-pencil</v-icon></v-btn>
+      </div>
       <ul v-if="fiche.interventions?.length">
         <li v-for="i in fiche.interventions" :key="i.id">
           <strong>{{ formatDate(i.date) }}</strong> — {{ i.type }}<br />
-          <small>{{ i.observations }}</small>
+          <small>{{ i.observations || '—' }}</small>
         </li>
       </ul>
-      <p v-else>Aucune intervention enregistrée.</p>
-    </section>
+      <p v-else class="text-grey">Aucune intervention enregistrée.</p>
+    </v-card>
 
-    <!-- Traitements -->
-    <section class="bloc">
-      <h3>💊 Traitements actifs</h3>
-      <ul v-if="fiche.traitements?.length">
-        <li v-for="t in fiche.traitements" :key="t.id">
-          <strong>{{ t.type }}</strong> — {{ t.posologie }} pendant {{ t.duree }} jours<br />
-          <small>Début : {{ formatDate(t.debut) }} — {{ t.actif ? '🟢 Actif' : '🔘 Terminé' }}</small>
-        </li>
-      </ul>
-      <p v-else>Aucun traitement actif.</p>
-    </section>
-
-    <!-- Rappels -->
-    <section class="bloc">
-      <h3>📬 Rappels vaccinaux</h3>
-      <ul v-if="fiche.rappels?.length">
-        <li v-for="r in fiche.rappels" :key="r.type">
-          {{ r.type }} — prochain : {{ formatDate(r.prochain) }}
-          <span v-if="r.rappelAutomatique">🔔</span>
-        </li>
-      </ul>
-      <p v-else>Aucun rappel programmé.</p>
-    </section>
-
-    <!-- Notes -->
-    <section class="bloc">
-      <h3>📝 Notes cliniques</h3>
-      <p><strong>Comportement :</strong> {{ fiche.notes?.comportement || '—' }}</p>
-      <p><strong>Allergies :</strong> {{ fiche.notes?.allergies?.join(', ') || '—' }}</p>
-      <p><strong>Recommandations :</strong> {{ fiche.notes?.recommandations || '—' }}</p>
-    </section>
-
-    <!-- Documents -->
-    <section class="bloc">
-      <h3>📁 Documents médicaux</h3>
-      <ul v-if="fiche.documents?.length">
-        <li v-for="doc in fiche.documents" :key="doc.url">
-          {{ doc.type }} — {{ formatDate(doc.date) }}
-          <a :href="doc.url" target="_blank">🔗 Ouvrir</a>
-        </li>
-      </ul>
-      <p v-else>Aucun document ajouté.</p>
-    </section>
+    <!-- Modale édition future -->
+    <!-- <ModalEditionFiche
+      v-if="sectionEnEdition"
+      :section="sectionEnEdition"
+      :data="fiche.value[sectionEnEdition]"
+      @close="fermerEdition"
+      @save="sauvegarderSection"
+    /> -->
   </div>
 
   <div v-else>
-    <h2>⚠️ Aucun animal trouvé avec l’identifiant : {{ animalId }}</h2>
+    <h2 class="text-warning">⚠️ Aucun animal trouvé avec l’identifiant : {{ animalId }}</h2>
   </div>
 </template>
 
 <script setup>
 import { useRoute } from 'vue-router'
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useAnimalStore } from '@/stores/useAnimalStore'
 import { useClientStore } from '@/stores/useClientStore'
 
 const route = useRoute()
-const animalId = Number(route.params.animalId) // ✅ Cohérent avec la route
+const animalId = Number(route.params.animalId)
 
-const { animals } = useAnimalStore()
+const { animals, modifier } = useAnimalStore()
 const { clients } = useClientStore()
 
 const animal = computed(() => animals.find(a => a.id === animalId))
@@ -94,7 +128,12 @@ const fiche = computed(() => animal.value?.ficheMedicale || {})
 const client = computed(() => clients.find(c => c.id === animal.value?.clientId))
 
 function formatDate(dateStr) {
-  return new Date(dateStr).toLocaleDateString('fr-FR')
+  return dateStr ? new Date(dateStr).toLocaleDateString('fr-FR') : '—'
+}
+
+const sectionEnEdition = ref(null)
+function editSection(section) {
+  sectionEnEdition.value = section
 }
 </script>
 
@@ -104,25 +143,32 @@ function formatDate(dateStr) {
   font-family: 'Inter', sans-serif;
 }
 .bloc {
-  background: #f8f9fa;
-  padding: 1rem 1.5rem;
-  border-radius: 12px;
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
   margin-bottom: 1.5rem;
 }
-.bloc h3 {
+.bloc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.bloc-titre {
   font-size: 18px;
-  margin-bottom: 0.8rem;
-  color: #495057;
+  margin-bottom: 0.5rem;
+  color: #2c3e50;
 }
 ul {
-  padding-left: 1rem;
+  padding-left: 0.5rem;
 }
 li {
   margin-bottom: 0.6rem;
 }
-a {
-  margin-left: 10px;
-  color: #007bff;
-  font-size: 14px;
+.text-grey {
+  color: #7f8c8d;
+}
+.text-warning {
+  color: #f39c12;
 }
 </style>

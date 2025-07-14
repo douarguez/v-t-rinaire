@@ -29,13 +29,13 @@ export const useClientStore = defineStore('client', () => {
       ]
     }
   ])
+
   function addClient(client) {
     client.id = Date.now()
     client.interventions = client.interventions || []
     clients.value.push(client)
   }
 
-  // 📝 Modifier
   function updateClient(client) {
     const index = clients.value.findIndex(c => c.id === client.id)
     if (index !== -1) {
@@ -43,17 +43,21 @@ export const useClientStore = defineStore('client', () => {
     }
   }
 
-  // ❌ Supprimer + cascade animaux
   function deleteClient(id) {
     const animalStore = useAnimalStore()
-    animalStore.deleteAnimalsByClient(id) // Supprimer ses animaux
+    animalStore.deleteAnimalsByClient(id)
     clients.value = clients.value.filter(c => c.id !== id)
+  }
+
+  function getById(id) {
+    return clients.value.find(c => c.id === id)
   }
 
   return {
     clients,
     addClient,
     updateClient,
-    deleteClient
+    deleteClient,
+    getById
   }
 })

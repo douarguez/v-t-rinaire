@@ -11,14 +11,11 @@ export const useInterventionStore = defineStore('interventionStore', {
         title: i.title,
         start: i.start,
         end: i.end,
-        color: i.color || '#cccccc', // 🎨 couleur compatible FullCalendar
-        extendedProps: {
-          animalId: i.animalId,
-          type: i.type,
-          icone: i.icone,
-          traitement: i.traitement,
-          rappel: i.rappel
-        }
+        animalId: i.animalId,
+        typeId: i.typeId,
+        icone: i.icone,
+        traitement: i.traitement,
+        rappel: i.rappel
       }))
     }
   },
