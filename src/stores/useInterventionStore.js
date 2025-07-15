@@ -1,27 +1,62 @@
+// stores/useInterventionStore.js
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
 
-export const useInterventionStore = defineStore('intervention', () => {
-  const evenements = ref([])
+export const useInterventionStore = defineStore('interventionStore', {
+  state: () => ({
+    interventions: []
+  }),
 
-  function ajouter(evenement) {
-    evenements.value.push(evenement)
-  }
+  actions: {
+    chargerInterventions() {
+      const data = localStorage.getItem('interventions')
+      if (data) {
+        this.interventions = JSON.parse(data)
+      }
+    },
 
-  function modifier(id, data) {
-    const index = evenements.value.findIndex(e => e.id === id)
-    if (index !== -1) {
-      evenements.value[index] = { ...evenements.value[index], ...data }
+    sauvegarderInterventions() {
+      localStorage.setItem('interventions', JSON.stringify(this.interventions))
+    },
+
+    ajouter(intervention) {
+      this.interventions.push(intervention)
+      this.sauvegarderInterventions()
+    },
+
+    modifier(id, data) {
+      const index = this.interventions.findIndex(i => i.id === id)
+      if (index !== -1) {
+        Object.assign(this.interventions[index], data)
+        this.sauvegarderInterventions()
+      }
+    },
+
+    supprimer(id) {
+      this.interventions = this.interventions.filter(i => i.id !== id)
+      this.sauvegarderInterventions()
+    },
+
+    chargerDepuisListe(initialData) {
+      this.interventions = Array.isArray(initialData) ? [...initialData] : []
     }
-  }
+  },
 
-  function supprimer(id) {
-    evenements.value = evenements.value.filter(e => e.id !== id)
-  }
-
-  function charger(initialData) {
-    evenements.value = Array.isArray(initialData) ? [...initialData] : []
-  }
-
-  return { evenements, ajouter, modifier, supprimer, charger }
+  getters: {
+    evenements: (state) => {
+      return state.interventions.map(i => ({
+        id: i.id,
+        title: i.title,
+        start: i.start,
+        end: i.end,
+        color: i.color || '#cccccc',
+        extendedProps: {
+          animalId: i.animalId,
+          typeId: i.typeId || i.type,
+          icone: i.icone,
+          traitement: i.traitement,
+          rappel: i.rappel
+        }
+      }))
+   }
+  }
 })

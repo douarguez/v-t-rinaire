@@ -2,7 +2,6 @@
   <div class="page-animaux">
     <div class="page-header">
       <h2>{{ total }} animaux enregistrés</h2>
-      <v-btn color="primary" @click="ouvrirModale">+ Ajouter un animal</v-btn>
     </div>
 
     <div class="filters">
