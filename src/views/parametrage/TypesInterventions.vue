@@ -1,56 +1,49 @@
 <template>
   <v-container class="pa-6 background-page">
     <div class="page-header">
-      <h2 class="text-h5 font-weight-medium">{{ total }} types d’interventions</h2>
+      <h2 class="text-h5 font-weight-medium">{{ total }} dossiers médicaux</h2>
       <v-btn color="primary" @click="ouvrirAjout" prepend-icon="mdi-plus">
-        Ajouter un type
+        Ajouter un dossier
       </v-btn>
     </div>
 
-    <div v-if="types.length === 0" class="no-data">
-      Aucun type défini. Ajoutez-en un !
+    <div v-if="dossiers.length === 0" class="no-data">
+      Aucun dossier médical défini. Ajoutez-en un !
     </div>
 
     <v-data-table
       v-else
       :headers="headers"
-      :items="types"
+      :items="dossiers"
       :items-per-page="10"
       class="elevation-0 table-soft"
-      :no-data-text="'Aucun type défini'"
+      :no-data-text="'Aucun dossier défini'"
     >
-      <!-- Icône -->
-      <template #item.icone="{ item }">
-        <span>{{ item.icone || '-' }}</span>
+      <!-- Nom du patient -->
+      <template #item.nom="{ item }">
+        <span>{{ item.nom || '-' }}</span>
       </template>
 
-      <!-- Durée -->
-      <template #item.duree="{ item }">
-        <span>{{ formatDuree(item.duree) }}</span>
+      <!-- Date de naissance -->
+      <template #item.date_naissance="{ item }">
+        <span>{{ formatDate(item.date_naissance) }}</span>
       </template>
 
-      <!-- Groupe -->
-      <template #item.groupe="{ item }">
-        <span>{{ item.groupe || '-' }}</span>
+      <!-- Dernière consultation -->
+      <template #item.derniere_consultation="{ item }">
+        <span>{{ formatDate(item.derniere_consultation) || '-' }}</span>
       </template>
 
-      <!-- Couleur -->
-      <template #item.couleur="{ item }">
-        <div :style="{ backgroundColor: item.couleur, width: '24px', height: '24px', borderRadius: '50%' }"></div>
-      </template>
-
-      <!-- Traitement -->
-      <template #item.traitement="{ item }">
-        <v-chip :color="item.traitement ? 'success' : 'default'" variant="tonal" size="small">
-          {{ item.traitement ? 'Oui' : 'Non' }}
+      <!-- Statut -->
+      <template #item.statut="{ item }">
+        <v-chip :color="item.statut === 'Actif' ? 'success' : 'warning'" variant="tonal" size="small">
+          {{ item.statut || '-' }}
         </v-chip>
       </template>
 
-      <!-- Anesthésie -->
-      <template #item.requiert_anesthesie="{ item }">
-        <v-chip :color="item.requiert_anesthesie ? 'error' : 'default'" variant="tonal" size="small">
-          {{ item.requiert_anesthesie ? 'Oui' : 'Non' }}
-        </v-chip>
+      <!-- Allergies -->
+      <template #item.allergies="{ item }">
+        <span>{{ item.allergies || '-' }}</span>
       </template>
 
       <!-- Actions -->
@@ -66,22 +59,29 @@
 
     <v-dialog v-model="showDrawer" width="450">
       <v-card>
-        <v-card-title>{{ modeEdition ? 'Modifier' : 'Ajouter' }} un type</v-card-title>
+        <v-card-title>{{ modeEdition ? 'Modifier' : 'Ajouter' }} un dossier</v-card-title>
         <v-card-text>
           <v-form @submit.prevent="sauvegarder">
-            <v-text-field v-model="form.nom" label="Nom du type" required />
-            <v-text-field v-model="form.icone" label="Icône (texte)" />
-            <v-text-field v-model="form.duree" label="Durée estimée (min)" type="number" />
-            <v-color-picker v-model="form.couleur" hide-canvas flat />
-            <v-select
-              v-model="form.groupe"
-              :items="['Préventif', 'Curatif', 'Urgence']"
-              label="Groupe"
+            <v-text-field v-model="form.nom" label="Nom du patient" required />
+            <v-text-field
+              v-model="form.date_naissance"
+              label="Date de naissance"
+              type="date"
               required
             />
-            <v-switch v-model="form.traitement" label="Requiert traitement ?" />
-            <v-switch v-model="form.requiert_anesthesie" label="Requiert anesthésie ?" />
-            <v-textarea v-model="form.notes" label="Notes / consignes" auto-grow />
+            <v-text-field
+              v-model="form.derniere_consultation"
+              label="Dernière consultation"
+              type="date"
+            />
+            <v-select
+              v-model="form.statut"
+              :items="['Actif', 'Inactif']"
+              label="Statut"
+              required
+            />
+            <v-textarea v-model="form.allergies" label="Allergies" auto-grow />
+            <v-textarea v-model="form.notes" label="Notes médicales" auto-grow />
 
             <v-btn type="submit" color="primary" class="mt-4">Valider</v-btn>
           </v-form>
@@ -93,21 +93,19 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { useTypeInterventionStore } from '@/stores/useTypeInterventionStore'
+import { useMedicalRecordStore } from '@/stores/useMedicalRecordStore'
 
-const store = useTypeInterventionStore()
-const types = store.types
+const store = useMedicalRecordStore()
+const dossiers = store.dossiers
 
-const total = computed(() => types.length)
+const total = computed(() => dossiers.length)
 
 const headers = [
-  { title: 'Nom', value: 'nom' },
-  { title: 'Icône', value: 'icone' },
-  { title: 'Durée', value: 'duree' },
-  { title: 'Groupe', value: 'groupe' },
-  { title: 'Couleur', value: 'couleur', sortable: false },
-  { title: 'Traitement ?', value: 'traitement', sortable: false },
-  { title: 'Anesthésie ?', value: 'requiert_anesthesie', sortable: false },
+  { title: 'Nom du patient', value: 'nom' },
+  { title: 'Date de naissance', value: 'date_naissance' },
+  { title: 'Dernière consultation', value: 'derniere_consultation' },
+  { title: 'Statut', value: 'statut', sortable: false },
+  { title: 'Allergies', value: 'allergies' },
   { title: 'Actions', value: 'actions', sortable: false }
 ]
 
@@ -116,12 +114,10 @@ const modeEdition = ref(false)
 const form = ref({
   id: null,
   nom: '',
-  icone: '',
-  duree: 30,
-  couleur: '#74c69d',
-  traitement: false,
-  groupe: 'Préventif',
-  requiert_anesthesie: false,
+  date_naissance: '',
+  derniere_consultation: '',
+  statut: 'Actif',
+  allergies: '',
   notes: ''
 })
 
@@ -129,12 +125,10 @@ function ouvrirAjout() {
   form.value = {
     id: null,
     nom: '',
-    icone: '',
-    duree: 30,
-    couleur: '#74c69d',
-    traitement: false,
-    groupe: 'Préventif',
-    requiert_anesthesie: false,
+    date_naissance: '',
+    derniere_consultation: '',
+    statut: 'Actif',
+    allergies: '',
     notes: ''
   }
   modeEdition.value = false
@@ -160,10 +154,10 @@ function supprimer(id) {
   store.supprimer(id)
 }
 
-function formatDuree(minutes) {
-  const h = Math.floor(minutes / 60)
-  const m = minutes % 60
-  return `${h > 0 ? `${h}h` : ''}${m.toString().padStart(2, '0')}`
+function formatDate(date) {
+  if (!date) return null
+  const [year, month, day] = date.split('-')
+  return `${day}/${month}/${year}`
 }
 </script>
 

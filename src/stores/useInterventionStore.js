@@ -1,34 +1,27 @@
 import { defineStore } from 'pinia'
+import { ref } from 'vue'
 
-export const useInterventionStore = defineStore('interventionStore', {
-  state: () => ({
-    interventions: []
-  }),
-  getters: {
-    evenements: (state) => {
-      return state.interventions.map(i => ({
-        id: i.id,
-        title: i.title,
-        start: i.start,
-        end: i.end,
-        animalId: i.animalId,
-        typeId: i.typeId,
-        icone: i.icone,
-        traitement: i.traitement,
-        rappel: i.rappel
-      }))
-    }
-  },
-  actions: {
-    ajouter(intervention) {
-      this.interventions.push(intervention)
-    },
-    modifier(id, data) {
-      const index = this.interventions.findIndex(i => i.id === id)
-      if (index !== -1) Object.assign(this.interventions[index], data)
-    },
-    supprimer(id) {
-      this.interventions = this.interventions.filter(i => i.id !== id)
+export const useInterventionStore = defineStore('intervention', () => {
+  const evenements = ref([])
+
+  function ajouter(evenement) {
+    evenements.value.push(evenement)
+  }
+
+  function modifier(id, data) {
+    const index = evenements.value.findIndex(e => e.id === id)
+    if (index !== -1) {
+      evenements.value[index] = { ...evenements.value[index], ...data }
     }
   }
+
+  function supprimer(id) {
+    evenements.value = evenements.value.filter(e => e.id !== id)
+  }
+
+  function charger(initialData) {
+    evenements.value = Array.isArray(initialData) ? [...initialData] : []
+  }
+
+  return { evenements, ajouter, modifier, supprimer, charger }
 })

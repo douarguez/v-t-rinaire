@@ -17,17 +17,19 @@
       <v-col cols="12" md="6">
         <v-card class="card-soft">
           <h4 class="mb-4 text-title font-weight-medium">Rendez-vous du jour</h4>
-          <v-list dense>
+          <v-list density="compact">
             <v-list-item v-for="rdv in appointments" :key="rdv.time">
-              <v-list-item-content>
-                <v-list-item-title class="text-subtle font-light">
-                  {{ rdv.time }} – {{ rdv.petName }} ({{ rdv.owner }})
-                </v-list-item-title>
-              </v-list-item-content>
+              <v-list-item-title class="text-subtle font-light">
+                {{ rdv.time }} – {{ rdv.petName }} ({{ rdv.owner }})
+              </v-list-item-title>
             </v-list-item>
           </v-list>
+          <div v-if="appointments.length === 0" class="text-caption text-grey text-center mt-2">
+            Aucun rendez-vous prévu aujourd’hui 🐾
+          </div>
         </v-card>
       </v-col>
+
       <v-col cols="12" md="6">
         <v-card class="card-soft text-center">
           <h4 class="mb-2 text-title font-weight-medium">Revenu du jour</h4>
@@ -113,5 +115,9 @@ const monthlyRevenue = ref([
 
 .text-subtle {
   color: #7f8c8d;
+}
+
+.text-muted {
+  color: #999;
 }
 </style>
